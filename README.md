@@ -61,7 +61,7 @@ Select the Notebook that you have available in your Snowflake account within the
 
 Give the notebook a name and run it in a Container using CPUs.
 
-![image](img/2_run_on_container.png)
+![image](img/2_run_on_wh.png)
 
 you can run the entire Notebook and check each of the cells. This is the explanation for Unstructured Data section.
 
@@ -131,7 +131,7 @@ insert into DOCS_CHUNKS_TABLE (relative_path, chunk, chunk_index)
 SELECT * FROM DOCS_CHUNKS_TABLE;
 ```
 
-As a demo, we are going to show how CLASSIFY_TEXT Cortex function to classify the document type. We have two classes: Bike and Snow, and we will pass the document title and the first chunk of the document to the function
+See how CLASSIFY_TEXT Cortex function can be used to classify the document type. We have two classes: Bike and Snow, and we will pass the document title and the first chunk of the document to the function.
 
 ```SQL
 CREATE OR REPLACE TEMPORARY TABLE docs_categories AS WITH unique_documents AS (
@@ -221,10 +221,6 @@ as (
     from docs_chunks_table
 );
 ```
-
-If you have run these steps via the Notebook (recommended so you avoid copy/paste) you now have a cell for the the tool API.
-
-After this step, we have one tool ready to retrieve context from PDF and IMAGE files.
 
 ## Step 3: Set Up Structured Data to be Used by the Agent
 Another Tool that we will provide to the Cortex Agent will be Cortex Analyst, which will provide the capability to extract information from Snowflake Tables. In the API call we will provider the location of a Semantic file that contains information about the business terminology used to describe the data.
