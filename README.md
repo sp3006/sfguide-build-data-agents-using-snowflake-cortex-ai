@@ -469,9 +469,13 @@ Click on Projects -> Streamlit -> Streamlit App and "Create from repository":
 
 ![image](img/9_create_app.png)
 
+![image](img/9_create_app_2.png)
+
 Select the streamlit_app.py file:
 
-![image](img/10_select_file.png)
+![image](img/9_create_app_3.png)
+
+![image](img/9_create_app_4.png)
 
 And click on Create.
 
