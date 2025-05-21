@@ -419,7 +419,7 @@ Let's see what happens if we ask the following question:
 
 - What are the total sales for the carvers?
 
-You may have an answer like this:
+You may see this response:
 
 ![image](img/6_response.png)
 
@@ -437,6 +437,7 @@ AS (
   FROM DIM_ARTICLE
 );
 ```
+
 In the UI:
 
 - Remove the sample values provided
