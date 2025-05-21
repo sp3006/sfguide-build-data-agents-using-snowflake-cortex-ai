@@ -489,42 +489,44 @@ These are questions where the answers can be found in the PDF documents. For exa
 
 - **What is the guarantee of the premium bike?**
 
-![image](img/10_2_unstructured_questions.png)
+![image](img/10_unstructured_question.png)
 
 The streamlit_app.py code contains a display_citations() function as an example to show what pieces of information the Cortex Agent used to answer the questions. In this case we can see how it cites the warranty information extracted from the PDF file. 
 
 Try other questions:
 
-- **What is the length of the carver skies?**
+- **What is the length of the carver skis?**
 
-![image](img/10_2_carvers.png)
+![image](img/10_carvers_question.png)
 
 Since we have processed images, the extracted descriptions can also be used by Cortex Agents to answer questions. Here's one example:
 
 - **Is there any brand in the frame of the downhill bike?**
 
-![image](img/10_2_santa_cruz.png)
+![image](img/10_bikes_question.png)
 
 Fell free to explore the PDF documents and IMAGES files and ask your own questions
 
-### Unstructured data questions
+### Structured data questions
 
 These are analytical questions where the answers can be found in Snowflake Tables. Some examples:
 
-- How much are we selling for the carvers per year for the North region?
+- **How much are we selling for the carvers per year for the North region?**
 
-Notice that for this query, all 3 tables are used. Also Cortex Search integration in the semantic model understand that the article name is "Carver Skis":
+Notice that for this query, all 3 tables are used. Also Cortex Search integration in the semantic model understands that the article name is "Carver Skis":
 
 ![image](img/11_carver_query.png)
 
-- How much infant bike are we selling per month?
-- What are the top 5 customers buying the carvers?
+Some more questions to try:
 
-Observe the behavior of the following questions:
+- **How many infant bikes are we selling per month?**
+- **What are the top 5 customers buying the carvers?**
 
-- What are the monthly sales via online for the racing fast in central?
+Observe the behavior of the following question:
 
-Cortex Agents API sends the request to Cortex Analyst, but it is not able to filter by customer_region:
+- **What are the monthly sales via online for the racing fast in central?**
+
+Cortex Agents API sends the request to Cortex Analyst, but it is not able to filter by `customer_region`:
 
 ![image](img/14_central_question.png)
 
@@ -542,7 +544,6 @@ If we take a look at the [semantic file](https://github.com/Snowflake-Labs/sfgui
 ```
 
 This would be a good opportunity to fine tune the semantic model. Either adding all possible values if there aren't many or use Cortex Search as we have done before for the ARTICLE column.
-
 
 ## Step 7: Understand the Cortex Agents API
 
