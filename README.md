@@ -406,9 +406,11 @@ You can try some analytical questions to test your semantic file:
 
 ### Cortex Analyst and Cortex Search Integration
 
-We are going to explore the integration between Cortex Analyst and Cortex Search to provide better results. If we take a look at the semantic model, click on DIM_ARTICLE -> Dimensions and edit ARTICLE_NAME.
+Improve Tool Usage with Dynamic Literal Retrieval
 
-In the Dimension you will see that some sample values have been provided:
+Using Cortex Analyst integration with Cortex Search, we can improve the retrieval of possible values of a column without listing them all in the semantic model file. Let's try it as example for the ARTICLE NAMES.
+
+Click on DIM_ARTICLE -> Dimensions and edit ARTICLE_NAME. In the Dimension you will see that some sample values have been provided.
 
 ![image](img/5_sample_values.png)
 
