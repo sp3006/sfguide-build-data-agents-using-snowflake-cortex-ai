@@ -480,7 +480,7 @@ Select the **streamlit_app.py** file and click on **Create**.
 
 ![image](img/9_create_app_4.png)
 
-## Step 6: Run Application
+## Step 7: Run Application
 
 Open the Streamlit app and let's check it out.
 
@@ -546,7 +546,7 @@ If we take a look at the [semantic file](https://github.com/Snowflake-Labs/sfgui
 
 This would be a good opportunity to fine tune the semantic model. Either adding all possible values if there aren't many, or use Cortex Search as we have done before for the ARTICLE column.
 
-## Step 7: Cortex Agents API
+## Step 8: Cortex Agents
 
 When calling the [Cortex Agents](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents) API, we define the tools the Agent can use in that call. You can read the simple [Streamlit App](https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex-ai/blob/main/streamlit_app.py) you set up to understand the basics before trying to create something more elaborat and complex.
 
@@ -556,11 +556,11 @@ We define the **API_ENDPOINT** for the agent, and how to access the different to
 
 All of these services are added to the payload sent to the Cortex Agents API. We also provide the model we want to use to build the final response, the tools to be used, and any specific instructions for generating the response.
 
-## Step 8: (Optional) Integrations
+## Step 9: (Optional) Integrations
 
 Learn how to integrate Cortex Agents in [Slack](https://quickstarts.snowflake.com/guide/integrate_snowflake_cortex_agents_with_slack/index.html), [Microsoft Teams](https://quickstarts.snowflake.com/guide/integrate_snowflake_cortex_agents_with_microsoft_teams/index.html), and [Zoom](https://quickstarts.snowflake.com/guide/integrate-snowflake-cortex-agents-with-zoom/index.html).
 
-## Step 9: Conclusion And Resources
+## Step 10: Conclusion And Resources
 
 Congratulations! You've learned how to securely build data agents and agentic applications in Snowflake.
 
