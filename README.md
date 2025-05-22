@@ -548,8 +548,6 @@ We define the **API_ENDPOINT** for the agent, and how to access the different to
 
 All of these services are added to the payload sent to the Cortex Agents API. We also provide the model we want to use to build the final response, the tools to be used, and any specific instructions for generating the response.
 
-![image](img/13_api_2.png)
-
 ## Step 8: (Optional) Integrations
 
 Learn how to integrate Cortex Agents in [Slack](https://quickstarts.snowflake.com/guide/integrate_snowflake_cortex_agents_with_slack/index.html), [Microsoft Teams](https://quickstarts.snowflake.com/guide/integrate_snowflake_cortex_agents_with_microsoft_teams/index.html), and [Zoom](https://quickstarts.snowflake.com/guide/integrate-snowflake-cortex-agents-with-zoom/index.html).
