@@ -188,11 +188,11 @@ SELECT
     RELATIVE_PATH,
     CONCAT('This is a picture describing the bike: '|| RELATIVE_PATH || 
         'THIS IS THE DESCRIPTION: ' ||
-        SNOWFLAKE.CORTEX.COMPLETE('claude-3-5-sonnet',
+        SNOWFLAKE.CORTEX.COMPLETE('claude-4-sonnet',
         'DESCRIBE THIS IMAGE: ',
         TO_FILE('@DOCS', RELATIVE_PATH))) as chunk,
     0,
-    SNOWFLAKE.CORTEX.COMPLETE('claude-3-5-sonnet',
+    SNOWFLAKE.CORTEX.COMPLETE('claude-4-sonnet',
         'Classify this image, respond only with Bike or Snow: ',
         TO_FILE('@DOCS', RELATIVE_PATH)) as category,
 FROM 
