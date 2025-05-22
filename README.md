@@ -20,9 +20,9 @@ We’ll use a custom dataset focused on bikes and skis. This dataset is intentio
 * Use the account provided for you during the hands-on session, OR
 * A [Snowflake Trial Account](https://signup.snowflake.com/)
 
-## Step 1: Setup Git Integration 
+## Step 1: Setup 
 
-Open a Worksheet, copy/paste the following code and execute all statements from top to bottom. This will set up the Git repository and will copy everything you will be using during the lab.
+In Snowsight, open/create a SQL Worksheet, copy/paste the following code and execute all statements from top to bottom. This will set up the Git repository and will copy everything you will be using during the lab in your account.
 
 ``` sql
 CREATE or replace DATABASE DASH_CORTEX_AGENTS_SUMMIT;
@@ -50,23 +50,31 @@ COPY FILES
 ALTER STAGE docs REFRESH;
 ```
 
-## Step 2: Setup Unstructured Data Tools
+## Step 2: Open Snowflake Notebook
 
-We are going to be using a Snowflake Notebook to set up the tools that will be used by the Snowflake Cortex Agents API. Open the Notebook as shown below.
+We will use Snowflake Notebook to setup the tools that will be used by Snowflake Cortex Agents.
 
-Select the Notebook that you have already available in your Snowflake account:
+Let's get started!
+
+Select the Notebook that is already available in your Snowflake account.
 
 ![image](img/1_create_notebook.png)
 
-Give the notebook a name and select other options as shown below.
+Give it a name and select other options as shown below.
 
 ![image](img/2_run_on_wh.png)
 
 Let's run through the cells in the Notebook. Here are some details to keep in mind.
 
-Thanks to the GIT integration done in the previous step, the PDFs and image files we are going to be using have already been copied into your Snowflake account. We are using two sets of documents, for bikes and for skis, as well as images for both. 
+Thanks to the GIT integration done in the previous step, the PDFs and image files we are going to be using have already been copied into your Snowflake account. We are using two sets of documents, for bikes and skis, as well as images for both. 
 
-Now let's check the contents of the directory with our documents Note that this is an internal staging area but it could also be an external S3 location, so there is no need to actually copy the PDFs into Snowflake. 
+> ### NOTE: Steps 3 and 4 below can be completed in the Snowflake Notebook.
+
+## Step 3: Setup Unstructured Data Tool
+
+Let's preview the contents of the directory with our documents. 
+
+Note that this is an internal staging area but it could also be an external S3 location, so there is no need to actually copy the PDFs into Snowflake. 
 
 ```SQL
 SELECT * FROM DIRECTORY('@DOCS');
@@ -222,7 +230,7 @@ as (
 );
 ```
 
-## Step 3: Setup Structured Data Tool
+## Step 4: Setup Structured Data Tool
 
 Another tool that we will setup is Cortex Analyst. It will provide the capability to extract information from structured data stored in Snowflake tables. In the API call we will provider the location of our semantic file that contains information about the business terminology used to describe the data.
 
@@ -383,7 +391,7 @@ COPY FILES
     FILES = ('semantic.yaml', 'semantic_search.yaml');
 ```
 
-## Step 4: Explore the Semantic Model
+## Step 5: Explore the Semantic Model
 
 The [semantic model](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst/semantic-model-spec) maps business terminology to the structured data and adds contextual meaning. It allows [Cortex Analyst](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst) to generate the correct SQL for a question asked in natural language.
 
@@ -454,7 +462,7 @@ Notice that now Cortex Analyst is able to provide the right answer because of th
 
 ![image](img/8_right_answer.png)
 
-## Step 5: Streamlit Application
+## Step 6: Streamlit Application
 
 Now that we have the tools ready, we can create a Streamlit app that puts it all together using [Cortex Agents API](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents) API.
 
