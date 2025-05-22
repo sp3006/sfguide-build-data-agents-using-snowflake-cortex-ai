@@ -50,6 +50,8 @@ COPY FILES
 ALTER STAGE docs REFRESH;
 ```
 
+NOTE: As a result of this integration, all the PDFs and image files we are going to be using have been copied into your Snowflake account. 
+
 ## Step 2: Open Snowflake Notebook
 
 We will use Snowflake Notebook to setup the tools that will be used by Snowflake Cortex Agents.
@@ -64,15 +66,11 @@ Give it a name and select other options as shown below.
 
 ![image](img/2_run_on_wh.png)
 
-Let's run through the cells in the Notebook. Here are some details to keep in mind.
-
-Thanks to the GIT integration done in the previous step, the PDFs and image files we are going to be using have already been copied into your Snowflake account. We are using two sets of documents, for bikes and skis, as well as images for both. 
-
 > ###
-> ### IMPORTANT NOTE: Steps 3 and 4 should be completed in the Snowflake Notebook.
+> ### IMPORTANT NOTE: Run through all the cells in the Snowflake Notebook before proceeding.
 > ###
 
-## Step 5: Explore the Semantic Model
+## Step 3: Explore Semantic Model
 
 The [semantic model](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst/semantic-model-spec) maps business terminology to the structured data and adds contextual meaning. It allows [Cortex Analyst](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst) to generate the correct SQL for a question asked in natural language.
 
@@ -143,7 +141,7 @@ Notice that now Cortex Analyst is able to provide the right answer because of th
 
 ![image](img/8_right_answer.png)
 
-## Step 6: Streamlit Application
+## Step 4: Streamlit Application
 
 Now that we have the tools ready, we can create a Streamlit app that puts it all together using [Cortex Agents API](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents) API.
 
@@ -161,7 +159,7 @@ Select the **streamlit_app.py** file and click on **Create**.
 
 ![image](img/9_create_app_4.png)
 
-## Step 7: Run Application
+## Step 5: Run Application
 
 Open the Streamlit app and let's check it out.
 
@@ -227,7 +225,7 @@ If we take a look at the [semantic file](https://github.com/Snowflake-Labs/sfgui
 
 This would be a good opportunity to fine tune the semantic model. Either adding all possible values if there aren't many, or use Cortex Search as we have done before for the ARTICLE column.
 
-## Step 8: Cortex Agents
+## Step 6: Cortex Agents
 
 When calling the [Cortex Agents](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents) API, we define the tools the Agent can use in that call. You can read the simple [Streamlit App](https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex-ai/blob/main/streamlit_app.py) you set up to understand the basics before trying to create something more elaborat and complex.
 
@@ -237,11 +235,11 @@ We define the **API_ENDPOINT** for the agent, and how to access the different to
 
 All of these services are added to the payload sent to the Cortex Agents API. We also provide the model we want to use to build the final response, the tools to be used, and any specific instructions for generating the response.
 
-## Step 9: (Optional) Integrations
+## Step 7: (Optional) Integrations
 
 Learn how to integrate Cortex Agents in [Slack](https://quickstarts.snowflake.com/guide/integrate_snowflake_cortex_agents_with_slack/index.html), [Microsoft Teams](https://quickstarts.snowflake.com/guide/integrate_snowflake_cortex_agents_with_microsoft_teams/index.html), and [Zoom](https://quickstarts.snowflake.com/guide/integrate-snowflake-cortex-agents-with-zoom/index.html).
 
-## Step 10: Conclusion And Resources
+## Step 8: Conclusion And Resources
 
 Congratulations! You've learned how to securely build data agents and agentic applications in Snowflake.
 
