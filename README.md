@@ -1,28 +1,28 @@
-# Snowflake Dev Day 2025: Gen AI Bootcamp 
+# Snowflake Dev Day 2025
 
-## Build Data Agents using Snowflake Cortex AI
+## Building Agentic AI Applications In Snowflake
 
-In this step-by-step lab, you’ll learn how to build a Data Agent using Snowflake Cortex AI that can intelligently respond to sales assistant questions by reasoning over both structured and unstructured data.
+## Overview
 
-We’ll begin by setting up the tools that power the agent’s capabilities. Snowflake provides two powerful components to achieve this:
+In this hands-on lab, you’ll learn how to build a Data Agent using Snowflake Cortex AI that can intelligently respond to questions by reasoning over both structured and unstructured data.
 
-* Cortex Analyst – for analyzing structured data 
-* Cortex Search – for performing semantic search across unstructured content
+We’ll use a custom dataset focused on bikes and skis. This dataset is intentionally artificial, ensuring that no external LLM has prior knowledge of it. This gives us a clean and controlled environment to test and evaluate our data agent. By the end of the session, you’ll have a working AI-powered agent capable of understanding and retrieving insights across diverse data types — all securely within Snowflake.
 
-To make this lab hands-on and grounded, we’ll use a custom dataset focused on bikes and skis. This dataset is intentionally artificial and not available on the public web, ensuring that no external LLM has prior knowledge of it — giving you a clean, controlled environment to test and evaluate your agent.
+### What You Will Learn
 
-The first step is to either:
+- How to setup your environment using Git integration and Snowflake Notebooks 
+- How to work with semantic models and setup Cortex Analyst for structured data
+- How to setup Cortext Search for unstructured data like PDFs and images
+- How to use Cortex Agents REST API that uses these tools in a Streamlit application
 
-* Create your own Snowflake Trial Account, or
-* Use the account provided for you during the hands-on session.
+### What You Will Need
 
-Next, you’ll use Snowflake Git integration to pull down the necessary files, schema, and content that power this lab.
+* Use the account provided for you during the hands-on session, OR
+* A [Snowflake Trial Account](https://signup.snowflake.com/)
 
-By the end of the session, you’ll have a working AI-powered agent capable of understanding and retrieving insights across diverse data types — all securely within Snowflake.
+## Step 1: Setup Git Integration 
 
-## Step 1: Setup GIT Integration 
-
-Open a Worksheet, copy/paste the following code and execute all. This will set up the GIT repository and will copy everything you will be using during the lab.
+Open a Worksheet, copy/paste the following code and execute all statements from top to bottom. This will set up the Git repository and will copy everything you will be using during the lab.
 
 ``` sql
 CREATE or replace DATABASE DASH_CORTEX_AGENTS_SUMMIT;
@@ -34,7 +34,7 @@ CREATE OR REPLACE API INTEGRATION git_api_integration
 
 CREATE OR REPLACE GIT REPOSITORY git_repo
     api_integration = git_api_integration
-    origin = 'https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex';
+    origin = 'https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex-ai';
 
 -- Make sure we get the latest files
 ALTER GIT REPOSITORY git_repo FETCH;
@@ -48,36 +48,34 @@ COPY FILES
     FROM @DASH_CORTEX_AGENTS_SUMMIT.PUBLIC.git_repo/branches/main/docs/;
 
 ALTER STAGE docs REFRESH;
-
 ```
 
-## Step 2: Setup Unstructured Data Tools to be Used by the Agent
+## Step 2: Setup Unstructured Data Tools
 
-We are going to be using a Snowflake Notebook to set up the Tools that will be used by the Snowflake Cortex Agents API. Open the Notebook and follow each of the cells.
+We are going to be using a Snowflake Notebook to set up the tools that will be used by the Snowflake Cortex Agents API. Open the Notebook as shown below.
 
-Select the Notebook that you have available in your Snowflake account within the Git Repositories:
+Select the Notebook that you have already available in your Snowflake account:
 
 ![image](img/1_create_notebook.png)
 
-Give the notebook a name and run it in a Container using CPUs.
+Give the notebook a name and select other options as shown below.
 
 ![image](img/2_run_on_wh.png)
 
-you can run the entire Notebook and check each of the cells. This is the explanation for Unstructured Data section.
+Let's run through the cells in the Notebook. Here are some details to keep in mind.
 
-Thanks to the GIT integration done in the previous step, the PDF and IMAGE files that we are going to be using have already been copied into your Snowflake account. We are using two sets of documents, one for bikes and other for skis and images for both. 
+Thanks to the GIT integration done in the previous step, the PDFs and image files we are going to be using have already been copied into your Snowflake account. We are using two sets of documents, for bikes and for skis, as well as images for both. 
 
-Check the content of the directory with documents (PDF and JPEG). Note that this is an internal staging area but it could also be an external S3 location, so there is no need to actually copy the PDFs into Snowflake. 
+Now let's check the contents of the directory with our documents Note that this is an internal staging area but it could also be an external S3 location, so there is no need to actually copy the PDFs into Snowflake. 
 
 ```SQL
 SELECT * FROM DIRECTORY('@DOCS');
 ```
-### PDF Documents
+### PDFs
 
-To parse the documents, we are going to use the native Cortex [PARSE_DOCUMENT](https://docs.snowflake.com/en/sql-reference/functions/parse_document-snowflake-cortex). For LAYOUT we can specify OCR or LAYOUT. We will be using LAYOUT so the content is markdown formatted.
+To parse the documents, we are going to use the native Cortex [PARSE_DOCUMENT](https://docs.snowflake.com/en/sql-reference/functions/parse_document-snowflake-cortex). (For LAYOUT we can specify OCR or LAYOUT.) In our case, we will be using LAYOUT so the content is in markdown formatted.
 
 ```SQL
-
 CREATE OR REPLACE TEMPORARY TABLE RAW_TEXT AS
 SELECT 
     RELATIVE_PATH,
@@ -95,9 +93,9 @@ WHERE
 SELECT * FROM RAW_TEXT;
 ```
 
-Next we are going to split the content of the PDF file into chunks with some overlaps to make sure information and context are not lost. You can read more about token limits and text splitting in the [Cortex Search Documentation ](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview)
+Next we are going to split the contents of the PDF files into chunks with some overlap to make sure information and context is not lost. You can read more about token limits and text splitting in the [Cortex Search Documentation](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview).
 
-Create the table that will be used by Cortex Search Service as a Tool for Cortex Agents in order to retrieve information from PDF and JPEG files:
+Create the table that will be used by Cortex Search service as a tool for Cortex Agents in order to retrieve information from PDF and JPEG files.
 
 ```SQL
 create or replace TABLE DOCS_CHUNKS_TABLE ( 
@@ -131,7 +129,7 @@ insert into DOCS_CHUNKS_TABLE (relative_path, chunk, chunk_index)
 SELECT * FROM DOCS_CHUNKS_TABLE;
 ```
 
-See how CLASSIFY_TEXT Cortex function can be used to classify the document type. We have two classes: Bike and Snow, and we will pass the document title and the first chunk of the document to the function.
+Now let's see how CLASSIFY_TEXT Cortex function can be used to classify the document type. We have two classes Bike and Snow, and we will pass the document title and the first chunk of the document to the function.
 
 ```SQL
 CREATE OR REPLACE TEMPORARY TABLE docs_categories AS WITH unique_documents AS (
@@ -157,12 +155,13 @@ FROM
   docs_category_cte;
 ```
 
-You can check the categories:
+Let's review the categories:
 
 ```SQL
 select * from docs_categories;
 ```
-And update the table:
+
+And now let's update the table:
 
 ```SQL
 update docs_chunks_table 
@@ -170,9 +169,10 @@ update docs_chunks_table
   from docs_categories
   where  docs_chunks_table.relative_path = docs_categories.relative_path;
 ```
-### IMAGE Documents
 
-Now let's process the images we have for our bikes and skis. We are going to use the COMPLETE multi-modal function asking for an image description and classification. We will add this information into the DOCS_CHUNKS_TABLE where we also have the PDF documentation:
+### Images
+
+Now let's process the images we have for our bikes and skis. We are going to use the COMPLETE multi-modal function asking for an image description and classification. We will add this information into the DOCS_CHUNKS_TABLE where we also have the PDF documentation.
 
 ```SQL
 insert into DOCS_CHUNKS_TABLE (relative_path, chunk, chunk_index, category)
@@ -193,7 +193,7 @@ WHERE
     RELATIVE_PATH LIKE '%.jpeg';
 ```
 
-Check the descriptions created and that the Tool that will be used to retrieve information when needed:
+Check the images descriptions created. These will be used the tool to retrieve information when needed:
 
 ```SQL
 select * from DOCS_CHUNKS_TABLE
@@ -202,9 +202,9 @@ select * from DOCS_CHUNKS_TABLE
 
 ### Enable Cortex Search Service
 
-Now that we have processed the PDF and IMAGE documents, we can create a [Cortex Search Service](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview) that automatically will create embeddings and indexes over the chunks of text extracted. Read the docs for the different embedding models available.
+Now that we have processed the PDF and images, we can create a [Cortex Search Service](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview) that will automatically create embeddings and indexes over the chunks of text extracted. (Read the docs for the different embedding models available.)
 
-When creating the service, we also specify what is the TARGET_LAG. This is the frequency used by the service to maintain the service with new or deleted data. Check the [Automatic Processing of New Documents](https://quickstarts.snowflake.com/guide/ask_questions_to_your_own_documents_with_snowflake_cortex_search/index.html?index=..%2F..index#6) of that quickstart to understand how easy is to maintain your RAG updated when using Cortex Search.
+When creating the service, we also specify what is the TARGET_LAG. This is the frequency used by the service to maintain the service with new or deleted data. Refer to the [Automatic Processing of New Documents](https://quickstarts.snowflake.com/guide/ask_questions_to_your_own_documents_with_snowflake_cortex_search/index.html?index=..%2F..index#6) section to understand how easy is to maintain your RAG when using Cortex Search.
 
 ```SQL
 create or replace CORTEX SEARCH SERVICE DOCUMENTATION_TOOL
@@ -222,12 +222,11 @@ as (
 );
 ```
 
-## Step 3: Set Up Structured Data to be Used by the Agent
-Another Tool that we will provide to the Cortex Agent will be Cortex Analyst, which will provide the capability to extract information from Snowflake Tables. In the API call we will provider the location of a Semantic file that contains information about the business terminology used to describe the data.
+## Step 3: Setup Structured Data Tool
 
-First we are going to create some synthetic data about the bike and ski products that we have.
+Another tool that we will setup is Cortex Analyst. It will provide the capability to extract information from structured data stored in Snowflake tables. In the API call we will provider the location of our semantic file that contains information about the business terminology used to describe the data.
 
-We are going to create the following tables with content:
+First, let's create some tables and generate data that provides additional context about bikes and ski products.
 
 **DIM_ARTICLE – Article/Item Dimension**
 
@@ -272,9 +271,9 @@ Key Columns:
     SALES_CHANNEL: Sales channel used (e.g., Online, In-Store, Partner).
     PROMOTION_APPLIED: Boolean indicating if the sale involved a promotion or discount.
 
-You can continue executing the Notebook cells to create some syntetic data. 
+Let's create these tables and insert sample data:
 
-First some data for articles:
+**DIM_ARTICLE**
 
 ```SQL
 CREATE OR REPLACE TABLE DIM_ARTICLE (
@@ -298,7 +297,7 @@ VALUES
 (8, 'Racing Fast Skis', 'Skis', 'RacerX', 'Grey', 950);
 ```
 
-Data for Customers:
+**DIM_CUSTOMER**
 
 ```SQL
 CREATE OR REPLACE TABLE DIM_CUSTOMER (
@@ -334,7 +333,7 @@ SELECT
 FROM TABLE(GENERATOR(ROWCOUNT => 5000));
 ```
 
-And Sales data:
+**FACT_SALES**
 
 ```SQL
 CREATE OR REPLACE TABLE FACT_SALES (
@@ -373,7 +372,7 @@ JOIN TABLE(GENERATOR(ROWCOUNT => 10000)) ON TRUE
 ORDER BY DATE_SALES;
 ```
 
-In the next section, you are going to explore the Semantic File. We have prepared two files that you can copy from the GIT repository:
+In the next section, we're going to explore the Semantic model file. We have provided two files that you can copy from the GIT repository:
 
 ```SQL
 create or replace stage semantic_files ENCRYPTION = (TYPE = 'SNOWFLAKE_SSE') DIRECTORY = ( ENABLE = true );
@@ -384,15 +383,13 @@ COPY FILES
     FILES = ('semantic.yaml', 'semantic_search.yaml');
 ```
 
-## Step 4: Explore/Create the Semantic Model to be used by Cortex Analyst Tool
+## Step 4: Explore the Semantic Model
 
-The [semantic model](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst/semantic-model-spec) map business terminology to the database schema and adds contextual meaning. It allows [Cortex Analyst](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst) generate the correct SQL for a question asked in natural language.
+The [semantic model](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst/semantic-model-spec) maps business terminology to the structured data and adds contextual meaning. It allows [Cortex Analyst](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst) to generate the correct SQL for a question asked in natural language.
 
-We have already provided a couple of semantic models for you to explore. 
+### Open the semantic model
 
-### Open the existing semantic model
-
-Under AI & ML -> Studio, select "Cortex Analyst"
+Under **AI & ML** -> **Studio**, select **Cortex Analyst**
 
 ![image](img/3_cortex_analyst.png)
 
@@ -400,30 +397,30 @@ Select the existing semantic.yaml file
 
 ![image](img/4_select_semantic_file.png)
 
-### Test the Semantic Model
+### Test the semantic model
 
 You can try some analytical questions to test your semantic file:
 
-- What is the average revenue per transaction per sales channel?
-- What products are often bought by the same customers?
+- **What is the average revenue per transaction per sales channel?**
+- **What products are often bought by the same customers?**
 
 ### Cortex Analyst and Cortex Search Integration
 
-We are going to explore the integration between Cortex Analyst and Cortex Search to provide better results. If we take a look at the semantic model, click on DIM_ARTICLE -> Dimensions and edit ARTICLE_NAME:
+We are going to explore the integration between Cortex Analyst and Cortex Search to provide better results. If we take a look at the semantic model, click on DIM_ARTICLE -> Dimensions and edit ARTICLE_NAME.
 
-In the Dimension you will see that some Sample values have been provided:
+In the Dimension you will see that some sample values have been provided:
 
 ![image](img/5_sample_values.png)
 
 Let's see what happens if we ask the following question:
 
-- What are the total sales for the carvers?
+- **What are the total sales for the carvers?**
 
 You may see this response:
 
 ![image](img/6_response.png)
 
-Let's see what happens when we integrate the ARTICLE_NAME dimension with the Cortex Search Service we created in the Notebook (_ARTICLE_NAME_SEARCH). If you haven't run it already in the Notebook, this is the code to be executed:
+Now let's see what happens when we integrate the ARTICLE_NAME dimension with the Cortex Search Service we created in the Notebook (_ARTICLE_NAME_SEARCH). If you haven't run it already in the Notebook, execute this:
 
 ```SQL
 CREATE OR REPLACE CORTEX SEARCH SERVICE _ARTICLE_NAME_SEARCH
@@ -438,62 +435,56 @@ AS (
 );
 ```
 
-In the UI:
+Now back in the Semantic model UI:
 
 - Remove the sample values provided
 - Click on + Search Service and add _ARTICLE_NAME_SEARCH
 
-It will look like this:
+It should look like this:
 
 ![image](img/7_cortex_search_integration.png)
 
-Click on save, also save your semantic file (top right) and ask the same question again:
+Click on Save, also save your semantic file (top right) and ask the same question again:
 
-- What are the total sales for the carvers?
+- **What are the total sales for the carvers?**
 
 Notice that now Cortex Analyst is able to provide the right answer because of the Cortex Search integration, we asked for "Carvers" but found that the correct article to ask about is "Carver Skis":
 
 ![image](img/8_right_answer.png)
 
-Now that we have the tools ready, we can create our first App that leverages Cortex Agents API.
+## Step 5: Streamlit Application
 
-## Step 5: Setup Streamlit App that uses Cortex Agents API
+Now that we have the tools ready, we can create a Streamlit app that puts it all together using [Cortex Agents API](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents) API.
 
-Create one Streamlit App that uses the [Cortex Agents](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents) API.
+We are going to leverate code from: [streamlit_app.py](https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex-ai/blob/main/streamlit_app.py)
 
-We are going to leverate this initial code:
-
-[streamlit_app.py](https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex/blob/main/streamlit_app.py)
-
-Click on Projects -> Streamlit -> Streamlit App and "Create from repository":
+Click on **Projects** -> **Streamlit** -> **Streamlit App** and select "Create from repository" as shown below.
 
 ![image](img/9_create_app.png)
 
 ![image](img/9_create_app_2.png)
 
-Select the streamlit_app.py file:
+Select the **streamlit_app.py** file and click on **Create**.
 
 ![image](img/9_create_app_3.png)
 
 ![image](img/9_create_app_4.png)
 
-And click on Create.
+## Step 6: Run Application
 
-## Step 6: Explore the App
-
-Open the Streamlit App and try some of these questions:
+Open the Streamlit app and let's check it out.
 
 ### Unstructured data questions
 
-These are questions where the answers can be found in the PDF documents. For example:
+These are questions where the answers can be found in the PDF documents.
 
 - **What is the guarantee of the premium bike?**
 
 ![image](img/10_unstructured_question.png)
 
-The streamlit_app.py code contains a display_citations() function as an example to show what pieces of information the Cortex Agent used to answer the questions. In this case we can see how it cites the warranty information extracted from the PDF file. 
+The code contains a *display_citations()* function as an example to show what pieces of information the Cortex Agent used to answer the question. In this case, we can see how it cites the warranty information extracted from the PDF file. 
 
-Try other questions:
+Let's try these other questions.
 
 - **What is the length of the carver skis?**
 
@@ -505,24 +496,24 @@ Since we have processed images, the extracted descriptions can also be used by C
 
 ![image](img/10_bikes_question.png)
 
-Fell free to explore the PDF documents and IMAGES files and ask your own questions
+Fell free to explore the PDF documents and image files to ask your own questions.
 
 ### Structured data questions
 
-These are analytical questions where the answers can be found in Snowflake Tables. Some examples:
+These are analytical questions where the answers can be found in structured data stored in Snowflake tables.
 
 - **How much are we selling for the carvers per year for the North region?**
 
-Notice that for this query, all 3 tables are used. Also Cortex Search integration in the semantic model understands that the article name is "Carver Skis":
+Notice that for this query, all 3 tables are used. Also note that the Cortex Search integration in the semantic model understands that the article name is "Carver Skis".
 
 ![image](img/11_carver_query.png)
 
-Some more questions to try:
+Let's try these other questions.
 
 - **How many infant bikes are we selling per month?**
 - **What are the top 5 customers buying the carvers?**
 
-Observe the behavior of the following question:
+Now observe the behavior of the following question:
 
 - **What are the monthly sales via online for the racing fast in central?**
 
@@ -530,7 +521,7 @@ Cortex Agents API sends the request to Cortex Analyst, but it is not able to fil
 
 ![image](img/14_central_question.png)
 
-If we take a look at the [semantic file](https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex/blob/main/semantic_search.yaml) we can see that 'central' is not included as a sample value:
+If we take a look at the [semantic file](https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex-ai/blob/main/semantic_search.yaml) we can see that `Central` is not included as one of the sample values:
 
 ```code
       - name: CUSTOMER_REGION
@@ -543,34 +534,38 @@ If we take a look at the [semantic file](https://github.com/Snowflake-Labs/sfgui
         description: Geographic region where the customer is located.
 ```
 
-This would be a good opportunity to fine tune the semantic model. Either adding all possible values if there aren't many or use Cortex Search as we have done before for the ARTICLE column.
+This would be a good opportunity to fine tune the semantic model. Either adding all possible values if there aren't many, or use Cortex Search as we have done before for the ARTICLE column.
 
-## Step 7: Understand the Cortex Agents API
+## Step 7: Cortex Agents API
 
-When calling the [Cortex Agents](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents) API, we define the tools the Agent can use in that call. You can read the simple [Streamlit App](https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex/blob/main/streamlit_app.py) you set up to understand the basics before trying to create something more elaborate.
+When calling the [Cortex Agents](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents) API, we define the tools the Agent can use in that call. You can read the simple [Streamlit App](https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex-ai/blob/main/streamlit_app.py) you set up to understand the basics before trying to create something more elaborat and complex.
 
-We define the API_ENDPOINT for the Agent, and how to access the different tools we are going to use. In this lab we have two Cortex Search Services to retrieve information from PDFs about bikes and skis, and one Cortex Analyst Service to retrieve analytical information from Snowflake tables.
-
-The Cortex Search Services point to the Services that we created in the Notebook. The Cortex Analyst uses the semantic model we verified earlier.
+We define the **API_ENDPOINT** for the agent, and how to access the different tools its going to use. In this lab, we have two Cortex Search services to retrieve information from PDFs about bikes and skis, and one Cortex Analyst service to retrieve analytical information from Snowflake tables. The Cortex Search services were created in the Notebook and the Cortex Analyst uses the semantic model we verified earlier.
 
 ![image](img/12_api_1.png)
 
-Those services are added to the payload we send to the Cortex Agents API. We define the model we want to use to build the final response, the tools to be used and any specific instructions for building the response:
+All of these services are added to the payload sent to the Cortex Agents API. We also provide the model we want to use to build the final response, the tools to be used, and any specific instructions for generating the response.
 
 ![image](img/13_api_2.png)
 
+## Step 8: (Optional) Integrations
 
-## Step 8: Optional: Integrate Cortex Agents API with Slack
+Learn how to integrate Cortex Agents in [Slack](https://quickstarts.snowflake.com/guide/integrate_snowflake_cortex_agents_with_slack/index.html), [Microsoft Teams](https://quickstarts.snowflake.com/guide/integrate_snowflake_cortex_agents_with_microsoft_teams/index.html), and [Zoom](https://quickstarts.snowflake.com/guide/integrate-snowflake-cortex-agents-with-zoom/index.html).
 
-[This guide: Getting Started with Cortex Agents and Slack](https://quickstarts.snowflake.com/guide/integrate_snowflake_cortex_agents_with_slack/index.html?index=..%2F..index#0) provides instructions to integrate Cortex Agents with Slack. We are going to debrief it here step by step for the Tools you have created in this hands-on lab.
+## Step 9: Conclusion And Resources
 
+Congratulations! You've learned how to securely build data agents and agentic applications in Snowflake.
 
+### What You Learned
 
+- How to setup your environment using Git integration and Snowflake Notebooks 
+- How to work with semantic models and setup Cortex Analyst for structured data
+- How to setup Cortext Search for unstructured data like PDFs and images
+- How to use Cortex Agents REST API that uses these tools in a Streamlit application
 
+### Related Resources
 
-
-
-
-
-
-
+- [GitHub repo](https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex-ai)
+- [Cortex Agents](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents)
+- [Cortex Analyst](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst)
+- [Cortex Search](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview)
