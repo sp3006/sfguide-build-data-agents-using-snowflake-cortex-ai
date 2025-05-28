@@ -190,7 +190,7 @@ Fell free to explore the PDF documents and image files to ask your own questions
 
 These are analytical questions where the answers can be found in structured data stored in Snowflake tables.
 
-- **How much are we selling for the carvers per year for the North region?**
+- **How many carvers are we selling per year in the North region?**
 
 Notice that for this query, all 3 tables are used. Also note that the Cortex Search integration in the semantic model understands that the article name is "Carver Skis".
 
@@ -200,29 +200,6 @@ Let's try these other questions.
 
 - **How many infant bikes are we selling per month?**
 - **What are the top 5 customers buying the carvers?**
-
-Now observe the behavior of the following question:
-
-- **What are the monthly sales via online for the racing fast in central?**
-
-Cortex Agents API sends the request to Cortex Analyst, but it is not able to filter by `customer_region`:
-
-![image](img/14_central_question.png)
-
-If we take a look at the [semantic file](https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex-ai/blob/main/semantic_search.yaml) we can see that `Central` is not included as one of the sample values:
-
-```code
-      - name: CUSTOMER_REGION
-        expr: CUSTOMER_REGION
-        data_type: VARCHAR(16777216)
-        sample_values:
-          - North
-          - South
-          - East
-        description: Geographic region where the customer is located.
-```
-
-This would be a good opportunity to fine tune the semantic model. Either adding all possible values if there aren't many, or use Cortex Search as we have done before for the ARTICLE column.
 
 ## Step 6: Cortex Agents
 
