@@ -17,8 +17,7 @@ We’ll use a custom dataset focused on bikes and skis. This dataset is intentio
 
 ### What You Will Need
 
-* Use the account provided for you during the hands-on session, OR
-* A [Snowflake Trial Account](https://signup.snowflake.com/)
+* Use the account provided for you during the hands-on session
 
 ## Step 1: Setup 
 
