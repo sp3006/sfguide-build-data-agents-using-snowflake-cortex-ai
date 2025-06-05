@@ -26,7 +26,7 @@ def run_snowflake_query(query):
 def snowflake_api_call(query: str, limit: int = 10):
     
     payload = {
-        "model": "claude-3-7-sonnet",
+        "model": "claude-3-5-sonnet",
         "messages": [{"role": "user",
                       "content": 
                           [{"type": "text","text": query}]}],
